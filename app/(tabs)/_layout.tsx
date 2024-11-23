@@ -1,34 +1,65 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import Entypo from '@expo/vector-icons/Entypo';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
+    <Tabs>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+          title: "Home",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="customer" // This should just be 'customer'
+        options={{
+          title: 'Customer',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="user" size={size} color={color} />
+          ),
+          tabBarStyle: {
+            backgroundColor: '#f5f5f5',
+          },
+        }}
+      />
+
+      <Tabs.Screen
+        name="invoice"
+        options={{
+          title: 'Invoice',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="file-invoice" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="expenses"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          title: 'Expenses',
+          headerShown: true,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="rupee" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          headerShown: true,
+          tabBarIcon: ({ color, size }) => (
+            <Entypo name="dots-three-horizontal" size={size} color={color} />
           ),
         }}
       />
