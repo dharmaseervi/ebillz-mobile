@@ -22,7 +22,7 @@ const EditItemModal = ({
   const fetchItems = async (query) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/item?search=${query}`
+        `${process.env.EXPO_PUBLIC_API_URL}/item?search=${query}`
       );
       const data = await response.json();
       setItems(data.filterData);

@@ -39,7 +39,7 @@ const AddCustomerButton = ({ modalVisible, setModalVisible }) => {
     // Add customer logic
     const handleAddCustomer = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/customer`, {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customer`, {
                 method: 'POST',
                 body: JSON.stringify(customer),
                 headers: { 'Content-Type': 'application/json' },
@@ -71,7 +71,7 @@ const AddCustomerButton = ({ modalVisible, setModalVisible }) => {
                 {/* Add Customer Button */}
                 <TouchableOpacity
                     onPress={handleCreateInvoice}
-                    className="bg-blue-500 rounded-full p-3 shadow-lg"
+                    className="bg-blue-700 rounded-full p-3  "
                 >
                     <MaterialCommunityIcons name="plus" size={24} color="white" />
                 </TouchableOpacity>
@@ -86,7 +86,7 @@ const AddCustomerButton = ({ modalVisible, setModalVisible }) => {
             >
                 <View className="flex-1 bg-gray-100 ">
                     {/* Modal Header */}
-                    <View className="mt-16 p-4  flex-row justify-between items-center shadow-md">
+                    <View className="mt-16 p-4  flex-row justify-between items-center ">
                         <Text className="text-black text-xl font-bold">Add Customer</Text>
                         <TouchableOpacity onPress={() => setModalVisible(false)}>
                             <Text className="text-blue-700 text-lg font-semibold">Close</Text>
@@ -97,7 +97,7 @@ const AddCustomerButton = ({ modalVisible, setModalVisible }) => {
                     <ScrollView className="p-6 space-y-6">
                         {/* Customer Form Section */}
                         <Text className="text-gray-600 font-semibold text-lg">Personal Information</Text>
-                        <View className="bg-white p-4 rounded-lg shadow-sm">
+                        <View className="bg-white p-4 rounded-lg ">
                             <View className="flex-row items-center mb-4 border-b border-gray-300">
                                 <Feather name="user" size={20} color="gray" />
                                 <TextInput
@@ -168,15 +168,15 @@ const AddCustomerButton = ({ modalVisible, setModalVisible }) => {
                         </View>
 
                         {/* Buttons for adding or canceling */}
-                        <View className="flex flex-row justify-end space-x-4 mt-6">
+                        <View className="flex flex-row justify-between mt-6">
                             <TouchableOpacity
-                                className="bg-blue-500 w-36 py-3 rounded-lg flex justify-center items-center shadow-md"
+                                className="bg-blue-500 w-36 py-3 rounded-lg flex justify-center items-center "
                                 onPress={handleAddCustomer}
                             >
                                 <Text className="text-white font-semibold">Add Customer</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                className="bg-red-500 w-24 py-3 rounded-lg flex justify-center items-center shadow-md"
+                                className="bg-red-500 w-24 py-3 rounded-lg flex justify-center items-center "
                                 onPress={handleCancel}
                             >
                                 <Text className="text-white font-semibold">Cancel</Text>

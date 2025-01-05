@@ -1,7 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Modal, ScrollView, TextInput } from 'react-native';
-import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons, FontAwesome, Ionicons } from '@expo/vector-icons';
 import Paid from './paid';
 import Unpaid from './unpaid';
 import Allbill from './allbill';
@@ -11,6 +11,10 @@ import ItemModal from '@/app/components/invoice/itemModel';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ItemDetailsModel from '@/app/components/invoice/itemDetailsModel';
 import DiscountTaxModal from '@/app/components/invoice/DiscountTaxModal';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import BarcodeModel from '@/app/(scanner)/barcode-reader';
+import SortModel from '@/app/components/sortModel';
+import SearchModel from '@/app/components/searchModel';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -60,6 +64,24 @@ const TopTabNavigator = () => {
   const discount = subtotal * (discountTaxValues.discount / 100);
   const total = subtotal - discount + tax;
   const [items, setItems] = useState([])
+  const router = useRouter()
+  const [sortOption, setSortOption] = useState(''); // Sorting Preferences
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [searchModalVisible, setSearchModalVisible] = useState(false); // For Search Modal
+  const searchParams = useLocalSearchParams();
+  // Handle Sorting Preferences
+  const handleSort = (option) => {
+    setSortOption(option); // Set the selected sort option
+    setSortModalVisible(false); // Close Sort Modal
+  };
+
+  
+  useEffect(() => {
+    // Check the query parameter to determine if the modal should be open
+    if (searchParams?.modalVisible === 'true') {
+      setModalVisible(true);
+    }
+  }, [searchParams]);
 
   const handleRemoveItem = (index: number) => {
     setSelectedItems(prevItems => {
@@ -67,6 +89,7 @@ const TopTabNavigator = () => {
       return updatedItems;
     });
   };
+  const [barcodeModalVisible, setBarcodeModalVisible] = useState(false);
 
   const handleCreateInvoice = () => {
     setModalVisible(true);
@@ -74,7 +97,7 @@ const TopTabNavigator = () => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/customer?id=${customerId}`);
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customer?id=${customerId}`);
       const data = await res.json();
       if (data?.customer) {
         setCustomers(data.customer);
@@ -85,15 +108,15 @@ const TopTabNavigator = () => {
   };
   const fetchItems = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/item?id=${selectedItems}`);
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/item?id=${selectedItems}`);
       const data = await response.json();
       const itemsArray = Array.isArray(data.filterData) ? data.filterData : [];
       setItems(itemsArray);
-
     } catch (error) {
       console.error('Error fetching items:', error);
     }
   };
+
 
   useEffect(() => {
     fetchItems()
@@ -105,6 +128,7 @@ const TopTabNavigator = () => {
 
   const closeModal = () => {
     setModalVisible(false);
+    router.replace('/invoice'); // Remove the query parameter
   };
 
   const closeCustomerModal = () => {
@@ -141,6 +165,7 @@ const TopTabNavigator = () => {
   const handleSave = (newValues) => {
     setDiscountTaxValues(newValues);
   };
+
 
 
   const createInvoice = async () => {
@@ -192,13 +217,17 @@ const TopTabNavigator = () => {
 
 
   return (
-    <ModalProvider>
-      <SafeAreaView className='flex-1'>
+    <ModalProvider >
+      <SafeAreaView className='flex-1 bg-white'>
         <View className='flex-row justify-between items-center px-5 mb-3'>
           <Text className='text-2xl font-medium'>Invoice</Text>
-          <View className='flex-row items-center space-x-4'>
-            <MaterialCommunityIcons name="sort" size={24} color="black" />
-            <FontAwesome name="search" size={24} color="black" />
+          <View className='flex-row items-center gap-2'>
+            <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+              <MaterialCommunityIcons name="sort" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setSearchModalVisible(true)}>
+              <FontAwesome name="search" size={24} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -209,14 +238,20 @@ const TopTabNavigator = () => {
             tabBarStyle: { backgroundColor: '' },
           }}
         >
-          <TopTab.Screen name="Paid" component={Paid} />
-          <TopTab.Screen name="Unpaid" component={Unpaid} />
-          <TopTab.Screen name="AllBill" component={Allbill} />
+          <TopTab.Screen name="Paid" >
+            {() => <Paid sortOption={sortOption} />}
+          </TopTab.Screen>
+          <TopTab.Screen name="Unpaid" >
+            {() => <Unpaid sortOption={sortOption} />}
+          </TopTab.Screen>
+          <TopTab.Screen name="AllBill">
+            {() => <Allbill sortOption={sortOption} />}
+          </TopTab.Screen>
         </TopTab.Navigator>
 
         <TouchableOpacity
           onPress={handleCreateInvoice}
-          className="absolute bottom-4 right-4 bg-blue-500 rounded-full p-3"
+          className="absolute bottom-6 right-4 bg-blue-600 rounded-full p-3"
         >
           <MaterialCommunityIcons name="plus" size={24} color="white" />
         </TouchableOpacity>
@@ -228,13 +263,13 @@ const TopTabNavigator = () => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View className="flex-1 pt-16 bg-slate-100">
+          <View className="flex-1 pt-16 bg-white">
             <View className="flex-row justify-between items-center px-4">
               <TouchableOpacity onPress={closeModal}>
                 <Text className='text-blue-600 text-lg'>Close</Text>
               </TouchableOpacity>
               <Text className="text-xl text-black font-bold">Create Invoice</Text>
-              <TouchableOpacity onPress={closeModal}>
+              <TouchableOpacity onPress={() => createInvoice()} >
                 <Text className='text-blue-600 text-lg'>Save</Text>
               </TouchableOpacity>
             </View>
@@ -245,10 +280,10 @@ const TopTabNavigator = () => {
                 // Display "Select Customer" button if no customer is selected
                 <View className='mb-4'>
                   <TouchableOpacity
-                    className='bg-white px-4 py-2 rounded'
+                    className='bg-gray-200 px-4 py-2 rounded-lg'
                     onPress={() => setCustomerModalVisible(true)}
                   >
-                    <View className='flex flex-row justify-between'>
+                    <View className='flex flex-row justify-between p-1'>
                       <Text>Select Customer</Text>
                       <FontAwesome name={'angle-right'} size={20} />
                     </View>
@@ -256,7 +291,7 @@ const TopTabNavigator = () => {
                 </View>
               ) : (
                 // Show selected customer details if a customer is selected
-                <View className='bg-white p-3 rounded-lg mb-4'>
+                <View className='bg-gray-200 p-3 rounded-lg mb-4'>
                   {customers && (
                     <View>
                       <TouchableOpacity onPress={() => setCustomerModalVisible(true)} className='text-sm font-semibold text-gray-800'>
@@ -281,25 +316,33 @@ const TopTabNavigator = () => {
               {/* Items Section */}
               <View className='mb-4 '>
                 <Text className='uppercase text-black mb-1'>Items Details</Text>
-                <View className='bg-white  rounded-lg'>
+                <View className='bg-gray-200 rounded-lg '>
                   <TouchableOpacity
-                    className='bg-white px-4 py-2 rounded'
+                    className=' bg-gray-200 rounded-lg px-2'
                     onPress={() => setItemModalVisible(true)}
                   >
-                    <View className='flex flex-row justify-between'>
+                    <View className='flex flex-row  justify-between  items-center p-2 '>
                       <Text>Add Items</Text>
-                      <FontAwesome name="angle-right" size={20} />
+                      <View className='flex flex-row '>
+                        <TouchableOpacity onPress={() => { setBarcodeModalVisible(true) }} className='' >
+                          <Ionicons
+                            name='scan'
+                            size={20}
+                            color="blue"
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </TouchableOpacity>
 
                   {selectedItems.length > 0 && selectedItems.map((item, index) => (
-                    <View key={index} className='p-3'>
+                    <View key={index} className='p-3  '>
                       <TouchableOpacity
                         onPress={() => {
                           setSelectedItemId(item); // Set the selected item ID
                           setItemDetailsModal(true);  // Open the modal
                         }}
-                        className='flex flex-row justify-between py-1 border-b px-1 border-gray-200'>
+                        className='flex flex-row justify-between py-1 border-b px-1 border-gray-400'>
                         <View>
                           <Text className='font-semibold'>{item.name}</Text>
                           <Text>Qty: {item.quantity}</Text>
@@ -348,8 +391,8 @@ const TopTabNavigator = () => {
                 </View>
               </View>
 
-              <View className='bg-white p-4 rounded-lg '>
-                <Text className='uppercase text-black mb-2'>Invoice Details</Text>
+              <Text className='uppercase text-black mb-2'>Invoice Details</Text>
+              <View className='bg-gray-200 p-4 rounded-lg  '>
                 <View className='mb-2 flex flex-row  items-center justify-between border-b border-gray-200'>
                   <Text className='text-black'>Invoice Date</Text>
                   <View className='flex flex-row justify-center items-center '>
@@ -414,9 +457,7 @@ const TopTabNavigator = () => {
 
                 </View>
               </View>
-              <TouchableOpacity onPress={() => createInvoice()} className='border px-2 py-3 mt-2 rounded-lg flex justify-center items-center'>
-                <Text>create invoice</Text>
-              </TouchableOpacity>
+
             </ScrollView>
 
             {/* Customer and Item Modals */}
@@ -427,8 +468,16 @@ const TopTabNavigator = () => {
               onClose={() => setIsModalOpen(false)}
               onSave={handleSave}
               currentValues={discountTaxValues} />
+
+            <BarcodeModel visible={barcodeModalVisible}
+              onClose={() => setBarcodeModalVisible(false)}
+              onAddItem={setSelectedItems}
+            />
           </View>
         </Modal>
+        {/* Sort Modal */}
+        <SortModel onSort={handleSort} visible={sortModalVisible} onClose={() => setSortModalVisible(false)} />
+        <SearchModel visible={searchModalVisible} onClose={() => setSearchModalVisible(false)} searchType={'invoice'} />
       </SafeAreaView >
     </ModalProvider >
   );

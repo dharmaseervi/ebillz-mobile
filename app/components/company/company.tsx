@@ -25,7 +25,7 @@ const CompanyProfile = () => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/company')
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company`)
       const data = await response.json()
       console.log(data);
       
@@ -55,7 +55,7 @@ const CompanyProfile = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://localhost:3000/api/company/${companyId}`, {
+              const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company/${companyId}`, {
                 method: 'DELETE',
               })
               if (response.ok) {

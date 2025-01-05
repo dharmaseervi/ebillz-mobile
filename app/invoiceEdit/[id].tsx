@@ -1,7 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Modal, ScrollView, TextInput } from 'react-native';
-import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { ModalProvider } from '@/app/components/invoice/contextModel';
 import ItemModal from '@/app/components/invoice/itemModel';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -10,6 +10,7 @@ import DiscountTaxModal from '@/app/components/invoice/DiscountTaxModal';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import EditCustomerModal from '../components/invoiceEdit/customerEditModel';
 import EditItemModal from '../components/invoiceEdit/editItemModel';
+import BarcodeModel from '../(scanner)/barcode-reader';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -68,10 +69,11 @@ const UpdateInvoice = () => {
         });
     };
     const [invoice, setInvoice] = useState([])
+    const [barcodeModalVisible, setBarcodeModalVisible] = useState(false);
 
     const fetchInvoice = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/invoice?id=${id}`);
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/invoice?id=${id}`);
             const data = await res.json();
             setInvoice(data);
             setSelectedItems(data.items)
@@ -85,11 +87,10 @@ const UpdateInvoice = () => {
             console.error('Fetching error:', error);
         }
     }
-    console.log(customers, customerId);
 
     const fetchCustomers = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/customer?id=${customerId}`);
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customer?id=${customerId}`);
             const data = await res.json();
             if (data?.customer) {
                 setCustomers(data.customer);
@@ -103,7 +104,7 @@ const UpdateInvoice = () => {
         const itemIds = selectedItems.map(item => item._id).join(',');
         if (!itemIds) return; // Exit if no items selected
         try {
-            const response = await fetch(`http://localhost:3000/api/item?id=${itemIds}`);
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/item?id=${itemIds}`);
             const data = await response.json();
             const itemsArray = Array.isArray(data.filterData) ? data.filterData : [];
             setItems(itemsArray);
@@ -194,7 +195,7 @@ const UpdateInvoice = () => {
 
 
         try {
-            const res = await fetch('http://localhost:3000/api/invoice', {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/invoice`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -267,14 +268,22 @@ const UpdateInvoice = () => {
                         {/* Items Section */}
                         <View className='mb-4 '>
                             <Text className='uppercase text-black mb-1'>Items Details</Text>
-                            <View className='bg-white  rounded-lg'>
+                            <View className='bg-white rounded-lg '>
                                 <TouchableOpacity
-                                    className='bg-white px-4 py-2 rounded'
+                                    className=' bg-white rounded-lg px-2'
                                     onPress={() => setItemModalVisible(true)}
                                 >
-                                    <View className='flex flex-row justify-between'>
+                                    <View className='flex flex-row  justify-between  items-center p-2 '>
                                         <Text>Add Items</Text>
-                                        <FontAwesome name="angle-right" size={20} />
+                                        <View className='flex flex-row '>
+                                            <TouchableOpacity onPress={() => { setBarcodeModalVisible(true) }} className='' >
+                                                <Ionicons
+                                                    name='scan'
+                                                    size={30}
+                                                    color="blue"
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
 
@@ -413,6 +422,10 @@ const UpdateInvoice = () => {
                         onClose={() => setIsModalOpen(false)}
                         onSave={handleSave}
                         currentValues={discountTaxValues} />
+                    <BarcodeModel visible={barcodeModalVisible}
+                        onClose={() => setBarcodeModalVisible(false)}
+                        onAddItem={setSelectedItems}
+                    />
                 </View>
             </SafeAreaView >
         </ModalProvider >

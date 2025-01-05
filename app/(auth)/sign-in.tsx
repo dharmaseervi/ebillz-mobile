@@ -44,13 +44,13 @@ const SignIn = () => {
                     Welcome Back
                 </Text>
 
-                <View className="space-y-4">
+                <View className="flex gap-2  ">
                     <TextInput
                         autoCapitalize="none"
                         value={emailAddress}
                         placeholder="Enter your email"
                         onChangeText={setEmailAddress}
-                        className="border border-gray-300 rounded-md text-white px-4 py-3 bg-transparent text-lg"
+                        className="border border-gray-300 rounded-md text-black px-4 py-3 bg-white   "
                         placeholderTextColor="#999"
                     />
                     <TextInput
@@ -58,13 +58,13 @@ const SignIn = () => {
                         placeholder="Enter your password"
                         secureTextEntry={true}
                         onChangeText={setPassword}
-                        className="border border-gray-300 rounded-md text-white px-4 py-3 bg-transparent text-lg"
+                        className="border border-gray-300 rounded-md text-black px-4 py-3 bg-white "
                         placeholderTextColor="#999"
                     />
                 </View>
 
                 <TouchableOpacity
-                    className="mt-6 bg-indigo-700 py-3 rounded-md flex justify-center items-center"
+                    className="mt-6 bg-indigo-700 py-3 rounded-md flex justify-center items-center "
                     onPress={onSignInPress}
                 // Disable button while attempting sign-in
                 >
@@ -72,7 +72,7 @@ const SignIn = () => {
                         Sign In
                     </Text>
                 </TouchableOpacity>
-
+                
                 <View className="mt-4 flex justify-center items-center flex-row">
                     <Text className="text-white">Don't have an account?</Text>
                     <Link href="/sign-up">

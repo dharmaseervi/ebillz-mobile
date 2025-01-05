@@ -23,7 +23,7 @@ const EditCustomerModal = ({
     // Fetch customers from the API
     const fetchCustomers = async () => {
         try {
-            const res = await fetch(`http://localhost:3000/api/customer`);
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customer`);
             const data = await res.json();
             if (data) {
                 setCustomers(data.customers);
@@ -35,13 +35,14 @@ const EditCustomerModal = ({
         }
     };
  
+    console.log(customers,'cus mo');
+    
 
     
     // Handle customer selection
     const handleSelectCustomer = (id: string) => {
         setCurrentSelectedId(id); // Update local state
         setCustomerId(id); // Update parent state
-        console.log("Updated parent selectedCustomerId:", id);
         setTimeout(() => {
             setCustomerModalVisible(false); // Close modal
         }, 200);
@@ -50,7 +51,6 @@ const EditCustomerModal = ({
 
     useEffect(() => {
         if (visible) {
-            console.log("Modal opened. Fetching customers...");
             fetchCustomers();
     
             // Sync currentSelectedId with selectedCustomerId
@@ -64,8 +64,6 @@ const EditCustomerModal = ({
         }
     }, []);
     
-    console.log(currentSelectedId, 'current');
-
 
     // Filter customers based on the search term
     const filteredCustomers = customers.filter(customer =>

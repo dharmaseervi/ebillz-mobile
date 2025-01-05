@@ -15,7 +15,7 @@ const CustomerModal = ({ setCustomerModalVisible, visible, onClose, setCustomerI
 
   const fetchCustomers = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/customer`);
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customer`);
       const data = await res.json();
       if (data) {
         setCustomers(data.customers);

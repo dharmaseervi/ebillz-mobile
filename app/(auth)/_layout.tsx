@@ -17,30 +17,22 @@ const AuthRoutesLayout = () => {
 
     // Render Auth Screens if user is not signed in
     return (
-        <ImageBackground
-            source={require('../../assets/images/bg.jpg')} // Background image
-            style={{ flex: 1 }}
-            resizeMode="cover"
-        >
-            <SafeAreaView style={{ flex: 1 }} >
-                <Stack>
-                    <Stack.Screen
-                        name="sign-in"
-                        options={{
-                            title: "Sign In",
-                            headerShown: false,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="sign-up"
-                        options={{
-                            title: "Sign Up",
-                            headerShown: false,
-                        }}
-                    />
-                </Stack>
-            </SafeAreaView>
-        </ImageBackground>
+        <Stack>
+            <Stack.Screen
+                name="sign-in"
+                options={{
+                    title: "Sign In",
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="sign-up"
+                options={{
+                    title: "Sign Up",
+                    headerShown: false,
+                }}
+            />
+        </Stack>
     );
 }
 export default AuthRoutesLayout

@@ -19,7 +19,7 @@ export default function TabLayout() {
           ),
         }}
       />
-       <Tabs.Screen
+      <Tabs.Screen
         name="customer" // This should just be 'customer'
         options={{
           title: 'Customer',
@@ -47,9 +47,19 @@ export default function TabLayout() {
         name="expenses"
         options={{
           title: 'Expenses',
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="rupee" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="items"
+        options={{
+          title: 'items',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="cart-plus" size={size} color={color} />
           ),
         }}
       />
@@ -57,7 +67,7 @@ export default function TabLayout() {
         name="more"
         options={{
           title: 'More',
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Entypo name="dots-three-horizontal" size={size} color={color} />
           ),

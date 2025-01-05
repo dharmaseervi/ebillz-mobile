@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 
-
-
 interface CompanyDetails {
     companyName: string
     address: string
@@ -31,11 +29,10 @@ const EditCompany = () => {
     useEffect(() => {
         fetchCompanyDetails()
     }, [companyId])
-    console.log(companyId);
 
     const fetchCompanyDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/company?id=${companyId}`)
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company?id=${companyId}`)
             if (!response.ok) {
                 throw new Error('Failed to fetch company details')
             }
@@ -57,7 +54,7 @@ const EditCompany = () => {
 
         setSaving(true)
         try {
-            const response = await fetch(`http://localhost:3000/api/company?id=${companyId}`, {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company?id=${companyId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -118,7 +115,7 @@ const EditCompany = () => {
                     <View>
                         <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</Text>
                         <TextInput
-                            value={companyDetails.city}
+                            value={companyDetails?.city}
                             onChangeText={(value) => handleInputChange('city', value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800"
                             placeholder="Enter city"
@@ -129,7 +126,7 @@ const EditCompany = () => {
                     <View>
                         <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State</Text>
                         <TextInput
-                            value={companyDetails.state}
+                            value={companyDetails?.state}
                             onChangeText={(value) => handleInputChange('state', value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800"
                             placeholder="Enter state"
@@ -140,7 +137,7 @@ const EditCompany = () => {
                     <View>
                         <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ZIP Code</Text>
                         <TextInput
-                            value={companyDetails.zip}
+                            value={companyDetails?.zip}
                             onChangeText={(value) => handleInputChange('zip', value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800"
                             placeholder="Enter ZIP code"
@@ -152,7 +149,7 @@ const EditCompany = () => {
                     <View>
                         <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mobile Number</Text>
                         <TextInput
-                            value={companyDetails.contactNumber}
+                            value={companyDetails?.contactNumber}
                             onChangeText={(value) => handleInputChange('contactNumber', value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800"
                             placeholder="Enter mobile number"
@@ -164,7 +161,7 @@ const EditCompany = () => {
                     <View>
                         <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">GST Number</Text>
                         <TextInput
-                            value={companyDetails.gstNumber}
+                            value={companyDetails?.gstNumber}
                             onChangeText={(value) => handleInputChange('gstNumber', value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800"
                             placeholder="Enter GST number"
